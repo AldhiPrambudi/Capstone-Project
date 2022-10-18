@@ -22,12 +22,12 @@ with btn1:
              Grafik disamping menunjukkan hasil dari survei.
              """)
 with btn2:
-    btn = Image.open('src\Milenial.png')
+    btn = Image.open('src/Milenial.png')
     st.image(btn, caption='Survei BTN Ungkap Alasan Milenial Belum Beli Rumah')
 
 upah1, upah2 = st.columns([2.5,1.5])
 with upah1:
-    upah = Image.open('src\\Upah.png')
+    upah = Image.open('src//Upah.png')
     st.image(upah)
     st.write("""
              [Persentase kenaikan Upah Minimum Kota Bandung](https://www.linovhr.com/umr-bandung-terbaru/)
