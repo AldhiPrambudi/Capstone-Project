@@ -84,19 +84,19 @@ with rumah:
         if option in 'Harga Minimal':
             st.write('Harga termurah : $', minim)
             minimrp = (minim*15498.50)
-            st.caption('Dalam rupiah sebesar : Rp. ' + str(minimrp).format("{:.2f}"))
+            st.caption('Dalam rupiah sebesar : Rp. ' + str(minimrp))
             rslt_df = df[df['Harga'] == minim]
             st.write('\nFitur lengkap rumah :\n', rslt_df.style.format("{:.2f}"))
         elif option in 'Rata rata':
             st.write('Harga rata rata : $', rata)
             ratarp = (rata*15498.50)
-            st.caption('Dalam rupiah sebesar : Rp. ' + str(ratarp).format("{:.2f}"))
+            st.caption('Dalam rupiah sebesar : Rp. ' + str(ratarp))
             rslt_df = df[df['Harga'] == rata]
             st.write('\nFitur lengkap rumah :\n', rslt_df.style.format("{:.2f}"))
         elif option in 'Harga Maksimal':
             st.write('Harga termahal : $', maksi)
             maksirp = (maksi*15498.50)
-            st.caption('Dalam rupiah sebesar : Rp. ' + str(maksirp).format("{:.2f}"))
+            st.caption('Dalam rupiah sebesar : Rp. ' + str(maksirp))
             rslt_df = df[df['Harga'] == maksi]
             st.write('\nFitur lengkap rumah :\n', rslt_df.style.format("{:.2f}"))
     
