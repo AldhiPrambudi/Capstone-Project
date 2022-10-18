@@ -22,12 +22,12 @@ with btn1:
              Grafik disamping menunjukkan hasil dari survei.
              """)
 with btn2:
-    btn = Image.open('D:\Pribadi\PROA\Tetris\Capstone Project\Milenial.png')
+    btn = Image.open('.\Milenial.png')
     st.image(btn, caption='Survei BTN Ungkap Alasan Milenial Belum Beli Rumah')
 
 upah1, upah2 = st.columns([2.5,1.5])
 with upah1:
-    upah = Image.open('D:\\Pribadi\\PROA\\Tetris\\Capstone Project\\Upah.png')
+    upah = Image.open('.\Upah.png')
     st.image(upah)
     st.write("""
              [Persentase kenaikan Upah Minimum Kota Bandung](https://www.linovhr.com/umr-bandung-terbaru/)
@@ -39,3 +39,7 @@ with upah2:
             Terdapat kenaikan dari tahun tahun sebelumnya, akan tetapi kenaikannya tidak terlalu signifikan. Sedangkan besar biaya hidup di Bandung berkisar Rp. 1.448.049 - Rp.5.571.254, dilansir dari Survei Biaya Hidup yang di paparkan oleh [rumah.com](https://www.rumah.com/areainsider/bandung/article/perkiraan-biaya-hidup-di-bandung-12546)
             """)
 
+rumah = st.container()
+
+with rumah:
+    
