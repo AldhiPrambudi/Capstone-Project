@@ -1,5 +1,13 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+
 import streamlit as st
 from PIL import Image
+
 
 st.markdown("<h1 style='text-align: center; color: black;'>Milenial, Generasi Tak Berumah?</h1>", unsafe_allow_html=True)
 st.markdown("---")
@@ -35,10 +43,45 @@ with upah1:
 with upah2:
     st.write("""
             Jawaban yang diberikan hampir semuanya berkaitan tentang keadaan ekonomi kaum milenial. Keadaan ekonomi dari kaum milenial bisa dihitung dengan menggunakan data upah minimum di Indonesia. Dilansir dari
-            [KEPUTUSAN GUBERNUR JAWA BARAT NOMOR: 561/Kep.732-Kesra/2021 TENTANG UPAH MINIMUM KABUPATEN/KOTA DI DAERAH PROVINSI JAWA BARAT TAHUN 2022](https://disnakertrans.jabarprov.go.id/produk_hukum/id/378), Upah Minimum 2022 di Jawa barat khusunya di Bandung sebesar Rp. 3.774.860.
-            Terdapat kenaikan dari tahun tahun sebelumnya, akan tetapi kenaikannya tidak terlalu signifikan. Sedangkan besar biaya hidup di Bandung berkisar Rp. 1.448.049 - Rp.5.571.254, dilansir dari Survei Biaya Hidup yang di paparkan oleh [rumah.com](https://www.rumah.com/areainsider/bandung/article/perkiraan-biaya-hidup-di-bandung-12546)
+            [KEPUTUSAN GUBERNUR JAWA BARAT NOMOR: 561/Kep.732-Kesra/2021 TENTANG UPAH MINIMUM KABUPATEN/KOTA DI DAERAH PROVINSI JAWA BARAT TAHUN 2022](https://disnakertrans.jabarprov.go.id/produk_hukum/id/378).
             """)
+st.write("""Upah Minimum 2022 di Jawa barat khusunya di Bandung sebesar Rp. 3.774.860.
+            Terdapat kenaikan dari tahun tahun sebelumnya, akan tetapi kenaikannya tidak terlalu signifikan. Sedangkan besar biaya hidup di Bandung berkisar Rp. 1.448.049 - Rp.5.571.254, dilansir dari Survei Biaya Hidup yang di paparkan oleh [rumah.com](https://www.rumah.com/areainsider/bandung/article/perkiraan-biaya-hidup-di-bandung-12546)""")
 
-#rumah = st.container()
+#Load Data
+df = pd.read_csv('src/Rumah123.csv', usecols=['Harga', 'KT', 'KM', 'Garasi', 'LT', 'LB'])
+#Cleansing set limit KT, KM, Garasi <= 5
+df.isnull().sum()
+df = df.dropna(subset=['Harga', 'KT', 'KM'])
+df = df[df.KT <= 5.0]
+df = df[df.KM <= 5.0]
+df = df[df.Garasi <= 5.0]
+#min,mean,max
+minim = df['Harga'].min().round(2)
+rata = df['Harga'].mean().round(2)
+maksi = df['Harga'].max().round(2)
 
-#with rumah:
+
+rumah = st.container()
+
+with rumah:
+    st.subheader("Data Harga Jual Rumah di Bandung Yang bersumber dari [rumah123.com](https://www.rumah123.com/jual/bandung/rumah/?page=1#qid~dac46e90-0fc8-4df5-9936-af1ebefcb4a2)")
+    st.write("""
+             Untuk memperkuat jawaban yang sudah diberikan dari kaum milenial pada survei BTN. Berikut data harga rumah di Bandung, dengan menggunakan batasan jumlah kamar tidur, kamar mandi, dan garasi berjumlah <= 5
+             """)
+
+    rum1, rum2 = st.columns([2.5,2.5])
+    with rum1:
+        st.dataframe(df.style.format("{:.2f}"))
+    
+    with rum2:  
+        option = st.selectbox(
+            'How would you like to be contacted?',
+            ('Harga Minimal', 'Rata rata', 'Harga Maksimal'))
+        if option in 'Harga Minimal':
+            st.write('Harga termurah :', minim)
+        elif option in 'Rata rata':
+            st.write('Harga rata rata :', rata)
+        elif option in 'Harga Maksimal':
+            st.write('Harga termahal :', maksi)
+    
