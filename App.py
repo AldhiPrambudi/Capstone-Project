@@ -4,9 +4,10 @@ import numpy as np
 import seaborn as sns
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
-
 import streamlit as st
 from PIL import Image
+import warnings
+warnings.filterwarnings('ignore')
 
 
 st.markdown("<h1 style='text-align: center; color: black;'>Milenial, Generasi Tak Berumah?</h1>", unsafe_allow_html=True)
