@@ -6,8 +6,6 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 import streamlit as st
 from PIL import Image
-import warnings
-warnings.filterwarnings('ignore')
 
 
 st.markdown("<h1 style='text-align: center; color: black;'>Milenial, Generasi Tak Berumah?</h1>", unsafe_allow_html=True)
@@ -74,15 +72,31 @@ with rumah:
     rum1, rum2 = st.columns([2.5,2.5])
     with rum1:
         st.dataframe(df.style.format("{:.2f}"))
+        st.caption("""
+                   Keterangan: Harga menggunakan satuan $ dengan exchange rate = 15498.50:1.
+                               LT dan LB menggunakan satuan m^2
+                   """)
     
     with rum2:  
         option = st.selectbox(
             'How would you like to be contacted?',
             ('Harga Minimal', 'Rata rata', 'Harga Maksimal'))
         if option in 'Harga Minimal':
-            st.write('Harga termurah :', minim)
+            st.write('Harga termurah : $', minim)
+            minimrp = (minim*15498.50)
+            st.caption('Dalam rupiah sebesar : Rp. ' + str(minimrp).format("{:.2f}"))
+            rslt_df = df[df['Harga'] == minim]
+            st.write('\nFitur lengkap rumah :\n', rslt_df.style.format("{:.2f}"))
         elif option in 'Rata rata':
-            st.write('Harga rata rata :', rata)
+            st.write('Harga rata rata : $', rata)
+            ratarp = (rata*15498.50)
+            st.caption('Dalam rupiah sebesar : Rp. ' + str(ratarp).format("{:.2f}"))
+            rslt_df = df[df['Harga'] == rata]
+            st.write('\nFitur lengkap rumah :\n', rslt_df.style.format("{:.2f}"))
         elif option in 'Harga Maksimal':
-            st.write('Harga termahal :', maksi)
+            st.write('Harga termahal : $', maksi)
+            maksirp = (maksi*15498.50)
+            st.caption('Dalam rupiah sebesar : Rp. ' + str(maksirp).format("{:.2f}"))
+            rslt_df = df[df['Harga'] == maksi]
+            st.write('\nFitur lengkap rumah :\n', rslt_df.style.format("{:.2f}"))
     
