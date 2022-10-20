@@ -14,7 +14,6 @@ st.markdown("---")
 st.write("Streamlit App by [Aldhi Prambudi](https://www.linkedin.com/in/aldhi-prambudi-9111501b7/)")
 
 awal = st.container()
-
 with awal:
     st.write("""
              Milenial adalah istilah yang digunakan untuk menyebut orang yang lahir antara tahun 1980 - 1996. orang termuda dari generasi ini baru lulus dari kuliah dan sedang meniti karir. Sedangkan beberapa orang yang tergolong sudah tua, sudah mapan dan sudah berkeluarga. 
@@ -60,9 +59,7 @@ minim = df['Harga'].min().round(2)
 rata = df['Harga'].mean().round(2)
 maksi = df['Harga'].max().round(2)
 
-
 rumah = st.container()
-
 with rumah:
     st.subheader("Data Harga Jual Rumah di Bandung Yang bersumber dari [rumah123.com](https://www.rumah123.com/jual/bandung/rumah/?page=1#qid~dac46e90-0fc8-4df5-9936-af1ebefcb4a2)")
     st.write("""
@@ -99,4 +96,13 @@ with rumah:
             st.caption('Dalam rupiah sebesar : Rp. ' + str(maksirp))
             rslt_df = df[df['Harga'] == maksi]
             st.write('\nFitur lengkap rumah :\n', rslt_df.style.format("{:.2f}"))
-    
+            
+corr = st.container()
+with corr:
+    corr1, corr2 = st.columns([2,3])
+    with corr1:
+        st.write("""
+                 Dari tabel korelasi matriks disamping, bisa ditarik kesimpulan bahwa luas tanah menjadi penentu utama dari penentuan harga suatu rumah
+                 """)
+    with corr2:
+        st.dataframe(df.corr().style.format("{:.2f}"))
