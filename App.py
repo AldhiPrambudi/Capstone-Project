@@ -59,8 +59,8 @@ minim = df['Harga'].min().round(2)
 rata = df['Harga'].mean().round(2)
 maksi = df['Harga'].max().round(2)
 
-rumah = st.container()
-with rumah:
+rumah1 = st.container()
+with rumah1:
     st.subheader("Data Harga Jual Rumah di Bandung Yang bersumber dari [rumah123.com](https://www.rumah123.com/jual/bandung/rumah/?page=1#qid~dac46e90-0fc8-4df5-9936-af1ebefcb4a2)")
     st.write("""
              Untuk memperkuat jawaban yang sudah diberikan dari kaum milenial pada survei BTN. Berikut data harga rumah di Bandung, dengan menggunakan batasan jumlah kamar tidur, kamar mandi, dan garasi berjumlah <= 5
@@ -95,14 +95,63 @@ with rumah:
             maksirp = (maksi*15498.50)
             st.caption('Dalam rupiah sebesar : Rp. ' + str(maksirp))
             rslt_df = df[df['Harga'] == maksi]
-            st.write('\nFitur lengkap rumah :\n', rslt_df.style.format("{:.2f}"))
+            st.write('\nFitur rumah :\n', rslt_df.style.format("{:.2f}"))
             
-corr = st.container()
-with corr:
-    corr1, corr2 = st.columns([2,3])
-    with corr1:
-        st.write("""
-                 Dari tabel korelasi matriks disamping, bisa ditarik kesimpulan bahwa luas tanah menjadi penentu utama dari penentuan harga suatu rumah
-                 """)
-    with corr2:
-        st.dataframe(df.corr().style.format("{:.2f}"))
+    corr = st.container()
+    with corr:
+        corr1, corr2 = st.columns([3,3])
+        with corr1:
+            st.write("""
+                    Berdasar data yang sudah diambil dari [rumah123.com](https://www.rumah123.com/jual/bandung/rumah/?page=1#qid~dac46e90-0fc8-4df5-9936-af1ebefcb4a2) dengan data yang diambil adalah "Harga, KT, KM, Garasi, LT dan LB".
+                    Diperoleh tabel korelasi matriks disamping, bisa ditarik kesimpulan bahwa luas tanah menjadi penentu utama dari penentuan harga suatu rumah.
+                    Kesimpulan bahwa luas tanah memiliki hubungan sebab akibat dengan harga rumah didasari dari artikel yang dimuat oleh [money.kompas.com](https://money.kompas.com/read/2021/10/23/133000526/5-cara-menentukan-harga-jual-rumah-yang-tepat?page=all)
+                    """)
+        with corr2:
+            st.dataframe(df.corr().style.format("{:.2f}"))
+        
+
+rumah2 = st.container()
+
+with rumah2:
+    st.write("""
+             Setelah mengetahui semua data diatas, kaum milenial setidaknya bisa memiliki gambaran mengenai harga rata rata suatu rumah di daerah Bandung.
+             Dan untuk memudahkan mengetahui lebih rinci harga rumah yang diinginkan bisa melalui website jual beli rumah, atau bisa melakukan prediksi harga tersendiri berdasarkan data rumah diatas menggunakan 
+             tools sederhana dibawah ini:
+             """)
+    
+    pred1, pred2 = st.columns([2.5,2.5])
+    
+    with pred1:
+        #prediction
+        x = df.drop(columns='Harga')
+        y = df['Harga']
+        #train
+        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.4, random_state=5)
+        print(x_train.shape)
+        print(y_train.shape)
+        print(x_test.shape)
+        print(y_test.shape)
+        #model
+        model = LinearRegression()
+        model.fit(x_train, y_train)
+        y_pred = model.predict(x_test)
+        model.score(x_test, y_test)
+        #inputdata
+        st.subheader("Prediksi harga rumah sesuai keinginan fitur yang diperlukan kaum milenial")
+        kam_tid = st.slider('Kamar Tidur', 1, 5)
+        kam_man = st.slider('Kamar Mandi', 1, 5)
+        garasi = st.slider('Garasi', 0, 5)
+        luas_tan = st.number_input('Luas Tanah')
+        luas_bang = st.number_input('Luas Bangunan')
+    with pred2:
+        if st.button('Hitung'):
+            st.write("""Dengan fitur rumah sebagai berikut: \n""")
+            st.write('Jumlah kamar tidur : '+str(kam_tid))
+            st.write('Jumlah kamar mandi : '+str(kam_man))
+            st.write('Jumlah garasi : '+str(garasi))
+            st.write('Luas tanah : '+str(luas_tan)+' m^2')
+            st.write('Luas bangunan : '+str(luas_bang)+' m^2')
+            prediksi = model.predict([[kam_tid,kam_man,garasi,luas_tan,luas_bang]])
+            st.write('$ '+'%.2f' % prediksi)
+            predikrp = prediksi*15498.50
+            st.write('Rp. '+'%.2f' % predikrp)
