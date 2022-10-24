@@ -1,11 +1,14 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import numpy_financial as npfStr
 import seaborn as sns
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 import streamlit as st
 from PIL import Image
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 
 st.markdown("<h1 style='text-align: center; color: black;'>Milenial, Generasi Tak Berumah?</h1>", unsafe_allow_html=True)
@@ -155,3 +158,168 @@ with rumah2:
             st.write('$ '+'%.2f' % prediksi)
             predikrp = prediksi*15498.50
             st.write('Rp. '+'%.2f' % predikrp)
+            
+rumah3 = st.container()
+
+with rumah3:
+    st.header("**Mortgage Details**")
+    st.write("""
+             Setelah mengetahui harga dari rumah sesuai dengan kriteria yang diinginkan. 
+             Berikut ini cara untuk mengetahui hutang/hipotek/mortgage yang perlu dilunasi: 
+             """)
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.subheader("Harga rumah")
+        home_value = st.number_input("Harga rumah(Rp.): ", min_value=0.0, format='%f')
+        
+        st.subheader("Suku bunga pinjaman kredit rumah (0 - 15)%")
+        interest_rate = st.number_input("Suku bunga pinjaman kredit rumah(%): ", min_value=0.0, max_value=15.0, format='%f')
+
+    with col2:
+        st.subheader("Down Payment (%)")
+        down_payment_percent = st.number_input("Down Payment(%): ", min_value=0.0, format='%f')
+        
+        st.subheader("Tenor (5-30 tahun)")
+        payment_years = st.number_input("Tenor (tenor): ", min_value=5, max_value=30, format='%d')
+        
+
+    down_payment = home_value* (down_payment_percent / 100)
+    loan_amount = home_value - down_payment
+    payment_months = payment_years*12
+    interest_rate = interest_rate / 100
+    periodic_interest_rate = (1+interest_rate)**(1/12) - 1
+    monthly_installment = -1*npfStr.pmt(periodic_interest_rate , payment_months, loan_amount)
+
+    st.subheader("**Down Payment:** Rp." + str(round(down_payment,2)))
+    st.subheader("**Jumlah hutang:** Rp." + str(round(loan_amount, 2)))
+    st.subheader("**Angsuran bulanan:** Rp." + str(round(monthly_installment, 2)))
+
+    st.markdown("---")
+
+    st.header("**Mortgage loan Amortization**")
+    principal_remaining = np.zeros(payment_months)
+    interest_pay_arr = np.zeros(payment_months)
+    principal_pay_arr = np.zeros(payment_months)
+
+    for i in range(0, payment_months):
+        
+        if i == 0:
+            previous_principal_remaining = loan_amount
+        else:
+            previous_principal_remaining = principal_remaining[i-1]
+            
+        interest_payment = round(previous_principal_remaining*periodic_interest_rate, 2)
+        principal_payment = round(monthly_installment - interest_payment, 2)
+        
+        if previous_principal_remaining - principal_payment < 0:
+            principal_payment = previous_principal_remaining
+        
+        interest_pay_arr[i] = interest_payment 
+        principal_pay_arr[i] = principal_payment
+        principal_remaining[i] = previous_principal_remaining - principal_payment
+        
+
+    month_num = np.arange(payment_months)
+    month_num = month_num + 1
+
+    principal_remaining = np.around(principal_remaining, decimals=2)
+
+    fig = make_subplots(
+        rows=2, cols=1,
+        vertical_spacing=0.03,
+        specs=[[{"type": "table"}],
+            [{"type": "scatter"}]
+            ]
+    )
+
+    fig.add_trace(
+            go.Table(
+                header=dict(
+                        values=['Month', 'Pembayaran pokok(Rp)', 'Pembayaran bunga(Rp)', 'Total tagihan hutang(Rp)']
+                    ),
+                cells = dict(
+                        values =[month_num, principal_pay_arr, interest_pay_arr, principal_remaining]
+                    )
+                ),
+            row=1, col=1
+        )
+
+    fig.add_trace(
+            go.Scatter(
+                    x=month_num,
+                    y=principal_pay_arr,
+                    name= "Pembayaran pokok"
+                ),
+            row=2, col=1
+        )
+
+    fig.append_trace(
+            go.Scatter(
+                x=month_num, 
+                y=interest_pay_arr,
+                name="Pembayaran bunga"
+            ),
+            row=2, col=1
+        )
+
+    fig.update_layout(title='Pembayaran angsuran hutang dalam bulan',
+                    xaxis_title='Month',
+                    yaxis_title='Amount(Rp)',
+                    height= 800,
+                    width = 1200,
+                    legend= dict(
+                            orientation="h",
+                            yanchor='top',
+                            y=0.47,
+                            xanchor= 'left',
+                            x= 0.01
+                        )
+                    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.markdown("---")
+    st.header("**Home Equity (With Constant Market Value)**")
+
+    cumulative_home_equity = np.cumsum(principal_pay_arr)
+    cumulative_interest_paid = np.cumsum(interest_pay_arr)
+
+
+    fig = go.Figure()
+    fig.add_trace(
+            go.Scatter(
+                x=month_num, 
+                y=cumulative_home_equity,
+                name="Cumulative Home Equity"
+            )
+        )
+
+    fig.add_trace(
+            go.Scatter(
+                x=month_num, 
+                y=cumulative_interest_paid,
+                name="Cumulative Interest Paid"
+            )
+        )
+
+    fig.update_layout(title='Cumulative Home Equity Over Time',
+                    xaxis_title='Month',
+                    yaxis_title='Amount(Rp)',
+                    height= 500,
+                    width = 1200,
+                    legend= dict(
+                            orientation="h",
+                            yanchor='top',
+                            y=0.98,
+                            xanchor= 'left',
+                            x= 0.01
+                        )
+                    )
+
+
+    st.plotly_chart(fig, use_container_width=True)
+    st.write("""
+             Dengan adanya prediksi harga dan perhitungan sederhana mengenai angsuran rumah diatas, diharapkan bisa meningkatkan daya beli rumah kaum milenial.
+             Dan setidaknya para kaum milenial memiliki gambaran yang jelas mengenai harga dan angsuran dari rumah yang ingin dimiliki.
+             """)
